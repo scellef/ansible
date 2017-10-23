@@ -1,0 +1,83 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: true
+  become: yes
+  tasks:
+  - name: Enable RPM Fusion respositories
+    dnf:
+      state: present
+      name: 
+      - "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-26.noarch.rpm"
+      - "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-26.noarch.rpm"
+
+  - name: Collect Google repository key
+    get_url: 
+      url: https://dl.google.com/linux/linux_signing_key.pub
+      dest: /root/google_signing_key.pub
+  - name: Import Google repository key
+    rpm_key:
+      state: present
+      key: /root/google_signing_key.pub
+
+  - name: Enable Google repository and install Chrome
+    dnf:
+      state: present
+      name: "https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm"
+
+  - name: Install standard packages
+    dnf:
+      state: present
+      name:
+      - atop
+      - git
+      - gnupg
+      - htop
+      - libvirt
+      - nmap
+      - nmap-ncat
+      - openldap-clients
+      - puppet
+      - python
+      - python3
+      - qemu
+      - ruby
+      - screen
+      - tcpdump
+      - tmux
+      - vim
+      - wine
+      - feh
+      - gnome-tweak-tool
+      - irssi
+      - keepassx
+      - mutt
+      - pass
+      - task
+      - vagrant
+      - virt-manager
+      - w3m
+      - weechat
+      - wireshark
+
+  - name: Rename everything in homedirectory to lowercase
+    shell: for i in "/home/scellef/*" ; do [[ "$i" =~ [A-Z] ]] && mv "$i" "${i,,}" ; true ; done
+
+  - name: Create directories
+    file: 
+      path: "{{item}}"
+      state: directory
+      owner: scellef
+      group: scellef
+    with_items:
+    - "/home/scellef/bin/cron"
+    - "/home/scellef/src"
+    - "/home/scellef/tmp"
+    - "/home/scellef/data"
+    - "/home/scellef/vagrant"
+    - "/home/scellef/git/github/people/"
+    - "/home/scellef/git/github/projects"
+    - "/home/scellef/.ssh"
+    - "/home/scellef/.secret"
+    - "/home/scellef/.gnupg"
+    - "/home/scellef/.password-store"
