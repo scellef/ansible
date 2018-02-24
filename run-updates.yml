@@ -1,0 +1,22 @@
+---
+- become: true
+  hosts: localhost
+  become_user: root
+  tasks:
+  - name: Clean up system, remove unused packages
+    apt:
+      autoclean: yes
+      autoremove: yes
+  - name: Update cached repositories
+    apt:
+      update_cache: yes
+    register: cache-updated
+  - name: Upgrade installed packages
+    apt:
+      state: latest
+      upgrade: dist
+  - name: Reboot system if needed
+    command: shutdown -r now 'Rebooting to complete system upgrade'
+      removes=/var/run/reboot-required
+
+
